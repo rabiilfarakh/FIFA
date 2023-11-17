@@ -1,4 +1,4 @@
-<?php
+ <?php
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -10,12 +10,15 @@ $conn = new mysqli($servername, $username, $password, $database);
 if ($conn->connect_error) {
     die("Échec de la connexion à la base de données : " . $conn->connect_error);
 }
-$sql = "SELECT groupe.NomGroupe, equipe.idEquipe, equipe.NomEquipe, equipe.Logo, equipe.NbrJoueur, equipe.population
+
+// requette
+$sql = "SELECT groupe.NomGroupe, equipe.idEquipe, equipe.NomEquipe, equipe.Logo, equipe.NbrJoueur, equipe.population, equipe.Continent, stade.NomStade, stade.ville, stade.Capacite
 FROM groupe
 JOIN equipe ON groupe.idGroupe = equipe.idGroupe
+JOIN stade ON groupe.idGroupe = stade.idGroupe
 ORDER BY groupe.idGroupe, equipe.idEquipe";
 
-
+//verifier le searche
 $result = $conn->query($sql);
 $i = 0;
 $j = 0;
@@ -32,26 +35,7 @@ if ($result) {
     }
 }
 
-// Ajoutez une nouvelle requête pour récupérer les informations supplémentaires
-$additionalInfoQuery = "SELECT NomEquipe, NbrJoueur, population FROM equipe WHERE idEquipe = ?";
 
-foreach ($groupedTeams as &$group) {
-    foreach ($group as &$team) {
-        $stmt = $conn->prepare($additionalInfoQuery);
-        $stmt->bind_param("i", $team['idEquipe']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $additionalInfo = $result->fetch_assoc();
-            $team = array_merge($team, $additionalInfo);
-        }
-
-        $stmt->close();
-    }
-}
-
-
-
-$conn->close();
 ?>
+
+
